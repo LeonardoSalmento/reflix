@@ -3,43 +3,35 @@ import PageDefault from '../../../components/PageDefault';
 import { Link } from 'react-router-dom';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
+import useForm from '../../../hooks/useForm';
+
 
 function CadastroCategoria() {
-  const [categorias, setCategorias] = useState([]);
   const initialValues = {
-    name:'',
+    title:'',
     description:'',
     color:''
   }
-  const [values, setValues] = useState(initialValues);
 
-  function setValue(key, value){
-    setValues({
-      ...values,
-      [key]: value,}
-      )
-  }
+  const {handleChange, values, clearForm} = useForm(initialValues);
 
-  function handleChange(changes){
-    
-    setValue(
-      changes.target.getAttribute('name'),
-      changes.target.value
-      );
-    }
+  const [categorias, setCategorias] = useState([]);
 
 
   function handleOnSubmit(infosDoEvento){
     infosDoEvento.preventDefault();
     setCategorias([
-      ...categorias, values.name
+      ...categorias, values.title
     ]);
+
+    clearForm(initialValues);
   }
 
 
   useEffect(() =>{
-    console.log('entrou')
-    const URL = 'http://localhost:8080/categorias';
+    const URL = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8080/categorias'
+    : 'https://reflix-imersao.herokuapp.com/categorias';
 
     fetch(URL).then(async (respostaDoServidor) =>{
       const resposta = await respostaDoServidor.json();
@@ -51,15 +43,15 @@ function CadastroCategoria() {
 
   return (
     <PageDefault>
-      <h1>Cadastro de Categoria: {values.name} </h1>
+      <h1>Cadastro de Categoria: {values.title} </h1>
 
       <form onSubmit={handleOnSubmit}>
         
         <FormField
         label= "Nome da categoria"
-        name="name"
+        name="title"
         type="text"
-        value={values.name}
+        value={values.title}
         onChange={handleChange}
         />
 
@@ -89,7 +81,7 @@ function CadastroCategoria() {
         {categorias.map((categoria, indice) => {
           return (
             <li key={`${categoria}${indice}`}>
-              {categoria.titulo}
+              {categoria.title}
             </li>
           )
         })}
